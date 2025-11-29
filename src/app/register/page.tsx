@@ -13,10 +13,37 @@ export default function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
+    const validateForm = (): boolean => {
+        // Email validation: email format, max 255 characters
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email) || email.length > 255) {
+            return false;
+        }
+
+        // Password validation: min 6, max 100 characters
+        if (!password || password.length < 6 || password.length > 100) {
+            return false;
+        }
+
+        // Name validation: 1-50 characters
+        if (!name || name.length < 1 || name.length > 50) {
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
+
+        // Frontend validation
+        if (!validateForm()) {
+            setError("Please input valid Email, Password or Name");
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const res = await fetch("/api/register", {
@@ -45,25 +72,29 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "300px" }}>
                 <input
                     type="text"
-                    placeholder="Name"
+                    placeholder="Name (1-50 characters)"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    maxLength={50}
                     required
                     style={{ padding: "0.5rem" }}
                 />
                 <input
                     type="email"
-                    placeholder="Email"
+                    placeholder="Email (max 255 characters)"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    maxLength={255}
                     required
                     style={{ padding: "0.5rem" }}
                 />
                 <input
                     type="password"
-                    placeholder="Password"
+                    placeholder="Password (6-100 characters)"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    minLength={6}
+                    maxLength={100}
                     required
                     style={{ padding: "0.5rem" }}
                 />
