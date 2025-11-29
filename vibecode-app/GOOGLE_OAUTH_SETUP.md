@@ -53,5 +53,6 @@ AUTH_GOOGLE_SECRET="your-client-secret-from-step-3"
 1. Make sure your database is running.
 2. Run migrations if you haven't: `npx prisma migrate dev`
 3. Start the server: `npm run dev`
+3. Start the server: `npm run dev`
 4. Go to `http://localhost:3000/login` and click "Sign in with Google".
 
