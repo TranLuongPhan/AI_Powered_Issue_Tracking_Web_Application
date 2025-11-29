@@ -581,6 +581,6 @@ If you encounter issues during testing:
 
 ---
 
-**Last Updated**: 2024
+**Last Updated**: 2025
 **Version**: 1.0.0
 
