@@ -85,13 +85,76 @@ export const config = NextAuth({
       });
 
       // Create a default project
-      await prisma.project.create({
+      const project = await prisma.project.create({
         data: {
           name: "My Project",
           description: "Your first project",
           teamId: team.id,
           ownerId: user.id,
         }
+      });
+
+      // Create sample issues for new users
+      const sampleIssues = [
+        {
+          title: "Implement user authentication",
+          description: "Add login and signup functionality",
+          status: "Done",
+          priority: "HIGH",
+          projectId: project.id,
+          creatorId: user.id,
+          assigneeId: user.id,
+        },
+        {
+          title: "Design dashboard UI",
+          description: "Create responsive dashboard layout",
+          status: "Done",
+          priority: "MEDIUM",
+          projectId: project.id,
+          creatorId: user.id,
+          assigneeId: user.id,
+        },
+        {
+          title: "Add issue tracking",
+          description: "Implement CRUD operations for issues",
+          status: "In Progress",
+          priority: "HIGH",
+          projectId: project.id,
+          creatorId: user.id,
+          assigneeId: user.id,
+        },
+        {
+          title: "Setup database schema",
+          description: "Create Prisma models and migrations",
+          status: "In Progress",
+          priority: "MEDIUM",
+          projectId: project.id,
+          creatorId: user.id,
+          assigneeId: user.id,
+        },
+        {
+          title: "Write unit tests",
+          description: "Add test coverage for API routes",
+          status: "Backlog",
+          priority: "LOW",
+          projectId: project.id,
+          creatorId: user.id,
+          assigneeId: user.id,
+        },
+        {
+          title: "Deploy to production",
+          description: "Configure Vercel deployment",
+          status: "Backlog",
+          priority: "MEDIUM",
+          projectId: project.id,
+          creatorId: user.id,
+          assigneeId: user.id,
+        },
+      ];
+
+      // Create all sample issues
+      await prisma.issue.createMany({
+        data: sampleIssues,
       });
     }
   },
