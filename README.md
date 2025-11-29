@@ -11,13 +11,13 @@ A modern, full-featured issue tracking system built with Next.js, featuring AI-p
   - Account linking for same email addresses
   - Auto-login after registration
 
-- **Profile Management (FR-005)**
+- **Profile Management**
   - Edit name (1-50 characters validation)
   - Update profile image via URL
   - Changes reflect immediately
   - Profile page accessible from dashboard
 
-- **Password Management (FR-006)**
+- **Password Management**
   - Change password functionality
   - Current password verification
   - New password validation (6-100 characters)
