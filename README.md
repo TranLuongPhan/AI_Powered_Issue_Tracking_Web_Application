@@ -321,7 +321,6 @@ Ensure all environment variables from `.env` are set in your deployment platform
 - Label filtering not yet implemented (schema ready)
 - Assignee filter needs user list population
 - AI features require OpenAI API key with quota
-- Demo account (`litmerscontest2911@gmail.com`) shows warning banner
 
 ## 🚧 Future Enhancements
 
