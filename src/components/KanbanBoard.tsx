@@ -36,11 +36,12 @@ interface Issue {
 interface KanbanBoardProps {
   issues: Issue[];
   onUpdateIssue: (id: string, newStatus: string) => void;
+  onDeleteIssue?: (id: string) => void;
 }
 
 const COLUMNS = ["Backlog", "In Progress", "Done"];
 
-function SortableItem({ issue }: { issue: Issue }) {
+function SortableItem({ issue, onDeleteIssue }: { issue: Issue; onDeleteIssue?: (id: string) => void }) {
   const {
     attributes,
     listeners,
@@ -56,6 +57,13 @@ function SortableItem({ issue }: { issue: Issue }) {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDeleteIssue) {
+      onDeleteIssue(issue.id);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -68,11 +76,34 @@ function SortableItem({ issue }: { issue: Issue }) {
         border: "1px solid #374151",
         cursor: "grab",
         boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
+        position: "relative",
       }}
       {...attributes}
       {...listeners}
     >
-      <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.95rem", fontWeight: 600, color: "white" }}>{issue.title}</h4>
+      {onDeleteIssue && (
+        <button
+          onClick={handleDelete}
+          style={{
+            position: "absolute",
+            top: "0.5rem",
+            right: "0.5rem",
+            padding: "0.25rem 0.5rem",
+            background: "#dc2626",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "0.7rem",
+            zIndex: 10,
+          }}
+          title="Delete issue"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          ×
+        </button>
+      )}
+      <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.95rem", fontWeight: 600, color: "white", paddingRight: onDeleteIssue ? "1.5rem" : "0" }}>{issue.title}</h4>
       {issue.description && (
         <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#d1d5db", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {issue.description}
@@ -85,7 +116,7 @@ function SortableItem({ issue }: { issue: Issue }) {
   );
 }
 
-export default function KanbanBoard({ issues, onUpdateIssue }: KanbanBoardProps) {
+export default function KanbanBoard({ issues, onUpdateIssue, onDeleteIssue }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
 
@@ -199,7 +230,7 @@ export default function KanbanBoard({ issues, onUpdateIssue }: KanbanBoardProps)
             >
               <div style={{ minHeight: "100px" }}>
                 {columns[columnId]?.map((issue) => (
-                  <SortableItem key={issue.id} issue={issue} />
+                  <SortableItem key={issue.id} issue={issue} onDeleteIssue={onDeleteIssue} />
                 ))}
               </div>
             </SortableContext>

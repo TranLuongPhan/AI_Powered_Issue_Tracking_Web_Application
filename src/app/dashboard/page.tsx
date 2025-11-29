@@ -109,6 +109,40 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDeleteIssue = async (id: string) => {
+    // If not logged in, just remove locally (fake data)
+    if (!session) {
+      setIssues(prev => prev.filter(issue => issue.id !== id));
+      return;
+    }
+
+    // Confirm deletion
+    if (!confirm("Are you sure you want to delete this issue?")) {
+      return;
+    }
+
+    // Optimistic update
+    setIssues(prev => prev.filter(issue => issue.id !== id));
+
+    try {
+        const res = await fetch("/api/issues", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            setError(errorData.message || "Failed to delete issue");
+            fetchIssues(); // Revert on error
+        }
+    } catch (error) {
+        console.error("Failed to delete issue", error);
+        setError("Network error. Please try again.");
+        fetchIssues(); // Revert on error
+    }
+  };
+
   const handleGenerateSummary = async () => {
     setSummaryLoading(true);
     setSummary(null);
@@ -291,7 +325,7 @@ export default function DashboardPage() {
         {issues.length === 0 ? (
             <p>No issues yet. Create one above!</p>
         ) : viewMode === "board" ? (
-            <KanbanBoard issues={issues} onUpdateIssue={handleUpdateIssueStatus} />
+            <KanbanBoard issues={issues} onUpdateIssue={handleUpdateIssueStatus} onDeleteIssue={handleDeleteIssue} />
         ) : (
             <div style={{ display: "grid", gap: "1rem" }}>
             {issues.map((issue) => (
@@ -327,6 +361,23 @@ export default function DashboardPage() {
                     }}>
                     {issue.priority}
                     </span>
+                    {session && (
+                      <button
+                        onClick={() => handleDeleteIssue(issue.id)}
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          background: "#dc2626",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          fontSize: "0.75rem"
+                        }}
+                        title="Delete issue"
+                      >
+                        Delete
+                      </button>
+                    )}
                 </div>
                 </div>
             ))}

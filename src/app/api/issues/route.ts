@@ -89,7 +89,8 @@ export async function GET(req: Request) {
       where: {
         project: {
           ownerId: user.id
-        }
+        },
+        deletedAt: null // Only get non-deleted issues
       },
       orderBy: {
         createdAt: 'desc'
@@ -152,6 +153,57 @@ export async function PUT(req: Request) {
     return NextResponse.json(updatedIssue);
   } catch (error) {
     console.error("Error updating issue:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await auth();
+    
+    if (!session || !session.user?.email) {
+      return NextResponse.json({ message: "Please login to use the service" }, { status: 401 });
+    }
+
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ message: "Issue ID is required" }, { status: 400 });
+    }
+
+    // Verify ownership
+    const user = await prisma.user.findUnique({
+        where: { email: session.user.email }
+    });
+
+    if (!user) {
+        return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const issue = await prisma.issue.findUnique({
+        where: { id },
+        include: { project: true }
+    });
+
+    if (!issue) {
+        return NextResponse.json({ message: "Issue not found" }, { status: 404 });
+    }
+
+    if (issue.project.ownerId !== user.id) {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    // Soft delete by setting deletedAt
+    const deletedIssue = await prisma.issue.update({
+      where: { id },
+      data: {
+        deletedAt: new Date()
+      }
+    });
+
+    return NextResponse.json({ message: "Issue deleted successfully", id: deletedIssue.id });
+  } catch (error) {
+    console.error("Error deleting issue:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
