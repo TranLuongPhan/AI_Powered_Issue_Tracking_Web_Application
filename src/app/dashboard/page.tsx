@@ -23,6 +23,8 @@ export default function DashboardPage() {
   const [priority, setPriority] = useState("MEDIUM");
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "board">("board");
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   useEffect(() => {
     fetchIssues();
@@ -75,6 +77,31 @@ export default function DashboardPage() {
     } catch (error) {
         console.error("Failed to update status");
         fetchIssues(); // Revert on error
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    setSummaryLoading(true);
+    setSummary(null);
+
+    try {
+      const res = await fetch("/api/ai/summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSummary(data.summary);
+      } else {
+        const error = await res.json();
+        setSummary(`Error: ${error.message || "Failed to generate summary"}`);
+      }
+    } catch (error) {
+      console.error("Failed to generate summary");
+      setSummary("Error: Unable to connect to AI service.");
+    } finally {
+      setSummaryLoading(false);
     }
   };
 
@@ -148,6 +175,45 @@ export default function DashboardPage() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* AI Summary Section */}
+      <div style={{ background: "#e0f2fe", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem", border: "1px solid #bae6fd" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <h2 style={{ margin: 0 }}>🤖 AI Project Summary</h2>
+          <button 
+            onClick={handleGenerateSummary}
+            disabled={summaryLoading}
+            style={{ 
+              padding: "0.5rem 1rem", 
+              background: summaryLoading ? "#9ca3af" : "#3b82f6", 
+              color: "white", 
+              border: "none", 
+              borderRadius: "4px",
+              cursor: summaryLoading ? "not-allowed" : "pointer",
+              fontWeight: "500"
+            }}
+          >
+            {summaryLoading ? "Generating..." : "Generate Summary"}
+          </button>
+        </div>
+        {summary && (
+          <div style={{ 
+            background: "white", 
+            padding: "1rem", 
+            borderRadius: "4px",
+            border: "1px solid #bae6fd",
+            lineHeight: "1.6",
+            color: "#1e293b"
+          }}>
+            {summary}
+          </div>
+        )}
+        {!summary && !summaryLoading && (
+          <p style={{ margin: 0, color: "#64748b", fontSize: "0.9rem" }}>
+            Click "Generate Summary" to get an AI-powered overview of your project status.
+          </p>
+        )}
       </div>
 
       {/* Issue Board / List */}
