@@ -404,19 +404,7 @@ export default function KanbanBoard({ issues, onUpdateIssue, onUpdatePriority, o
     >
       <div style={{ display: "flex", gap: "1.5rem", overflowX: "auto", paddingBottom: "1rem" }}>
         {COLUMNS.map((columnId) => (
-          <div
-            key={columnId}
-            style={{
-              background: "#374151",
-              border: "1px solid #1f2937",
-              borderRadius: "8px",
-              padding: "1rem",
-              minWidth: "280px",
-              width: "280px",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
+          <DroppableColumn key={columnId} columnId={columnId}>
             <h3 style={{ margin: "0 0 1rem 0", fontSize: "1rem", fontWeight: "bold", color: "white" }}>
               {columnId} <span style={{ color: "#d1d5db", fontWeight: "normal" }}>({columns[columnId]?.length || 0})</span>
             </h3>
