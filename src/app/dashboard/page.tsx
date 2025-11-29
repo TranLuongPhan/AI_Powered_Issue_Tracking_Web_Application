@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import LogoutButton from "@/components/LogoutButton";
 import Link from "next/link";
 import KanbanBoard from "@/components/KanbanBoard";
+import { useSession } from "next-auth/react";
 
 interface Issue {
   id: string;
@@ -12,8 +13,6 @@ interface Issue {
   status: string;
   priority: string;
 }
-
-import { useSession } from "next-auth/react";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -83,7 +82,7 @@ export default function DashboardPage() {
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <h3 style={{ margin: 0, color: "#666" }}>Hello, {session?.user?.name || "User"}</h3>
+          <h3 style={{ margin: 0, color: "#666", fontSize: "1.1rem" }}>Hello, {session?.user?.name || "User"}</h3>
           <h1 style={{ margin: 0 }}>My Dashboard</h1>
         </div>
         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
