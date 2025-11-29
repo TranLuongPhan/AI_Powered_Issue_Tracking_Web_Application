@@ -134,8 +134,31 @@ export default function DashboardPage() {
     }
   };
 
+  const isDemoAccount = session?.user?.email === "litmerscontest2911@gmail.com";
+
   return (
-    <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        #create-issue-form input::placeholder,
+        #create-issue-form textarea::placeholder {
+          color: #9ca3af;
+        }
+      `}} />
+      <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
+      {isDemoAccount && (
+        <div style={{ 
+          background: "#fef3c7", 
+          border: "1px solid #f59e0b", 
+          color: "#92400e", 
+          padding: "0.75rem 1rem", 
+          borderRadius: "8px", 
+          marginBottom: "1rem",
+          fontSize: "0.875rem",
+          fontWeight: "500"
+        }}>
+          This is just UI demo account, please login
+        </div>
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <h3 style={{ margin: 0, color: "#666", fontSize: "1.1rem" }}>Hello, {session?.user?.name || "User"}</h3>
@@ -160,8 +183,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Create Issue Form */}
-      <div style={{ background: "#f5f5f5", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h2>Create New Issue</h2>
+      <div style={{ background: "#374151", border: "2px solid #1f2937", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h2 style={{ color: "white", margin: "0 0 1rem 0" }}>Create New Issue</h2>
         {error && (
           <div style={{ 
             background: "#fee2e2", 
@@ -174,28 +197,28 @@ export default function DashboardPage() {
             {error}
           </div>
         )}
-        <form onSubmit={handleCreateIssue} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <form id="create-issue-form" onSubmit={handleCreateIssue} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <input
             type="text"
             placeholder="Issue Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            style={{ padding: "0.5rem" }}
+            style={{ padding: "0.5rem", background: "#1f2937", color: "white", border: "1px solid #4b5563", borderRadius: "4px" }}
           />
           <textarea
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            style={{ padding: "0.5rem", minHeight: "80px" }}
+            style={{ padding: "0.5rem", minHeight: "80px", background: "#1f2937", color: "white", border: "1px solid #4b5563", borderRadius: "4px" }}
           />
           <div style={{ display: "flex", gap: "1rem" }}>
-            <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ padding: "0.5rem" }}>
+            <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ padding: "0.5rem", background: "#1f2937", color: "white", border: "1px solid #4b5563", borderRadius: "4px" }}>
               <option value="Backlog">Backlog</option>
               <option value="In Progress">In Progress</option>
               <option value="Done">Done</option>
             </select>
-            <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ padding: "0.5rem" }}>
+            <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ padding: "0.5rem", background: "#1f2937", color: "white", border: "1px solid #4b5563", borderRadius: "4px" }}>
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
               <option value="HIGH">High</option>
@@ -273,7 +296,8 @@ export default function DashboardPage() {
             <div style={{ display: "grid", gap: "1rem" }}>
             {issues.map((issue) => (
                 <div key={issue.id} style={{ 
-                border: "1px solid #ddd", 
+                background: "#374151",
+                border: "1px solid #1f2937", 
                 padding: "1rem", 
                 borderRadius: "8px",
                 display: "flex",
@@ -281,8 +305,8 @@ export default function DashboardPage() {
                 alignItems: "center"
                 }}>
                 <div>
-                    <h3 style={{ margin: "0 0 0.5rem 0" }}>{issue.title}</h3>
-                    <p style={{ margin: 0, color: "#666" }}>{issue.description}</p>
+                    <h3 style={{ margin: "0 0 0.5rem 0", color: "white" }}>{issue.title}</h3>
+                    <p style={{ margin: 0, color: "#d1d5db" }}>{issue.description}</p>
                 </div>
                 <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                     <span style={{ 
@@ -310,5 +334,6 @@ export default function DashboardPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

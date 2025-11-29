@@ -41,8 +41,7 @@ export async function POST(req: Request) {
       },
       orderBy: {
         createdAt: 'desc'
-      },
-      take: 20 // Limit to last 20 issues for summary
+      }
     });
 
     if (issues.length === 0) {
@@ -51,20 +50,46 @@ export async function POST(req: Request) {
       });
     }
 
-    // Format issues for the AI prompt
+    // Calculate statistics
+    const totalIssues = issues.length;
+    const highPriorityIssues = issues.filter(i => i.priority === "HIGH");
+    const inProgressIssues = issues.filter(i => i.status === "In Progress");
+    const doneIssues = issues.filter(i => i.status === "Done");
+    const backlogIssues = issues.filter(i => i.status === "Backlog");
+
+    // Format high-priority issues for emphasis
+    const highPriorityText = highPriorityIssues.length > 0
+      ? highPriorityIssues.map((issue, idx) => 
+          `${idx + 1}. [${issue.status}] ${issue.title}${issue.description ? ` - ${issue.description}` : ''}`
+        ).join('\n')
+      : "None";
+
+    // Format all issues for the AI prompt
     const issuesText = issues.map((issue, idx) => 
       `${idx + 1}. [${issue.status}] ${issue.title} (Priority: ${issue.priority})${issue.description ? ` - ${issue.description}` : ''}`
     ).join('\n');
 
-    const prompt = `You are a project management assistant. Analyze the following list of issues and provide a concise summary (2-3 sentences) highlighting:
-1. Overall project status
-2. Key priorities or blockers
-3. Progress trends
+    const prompt = `You are a project management assistant. Analyze the following project data and provide a concise, actionable summary.
 
-Issues:
+PROJECT STATISTICS:
+- Total Issues: ${totalIssues}
+- High Priority Issues: ${highPriorityIssues.length}
+- In Progress: ${inProgressIssues.length}
+- Done: ${doneIssues.length}
+- Backlog: ${backlogIssues.length}
+
+HIGH PRIORITY ISSUES (These should be solved first):
+${highPriorityText}
+
+ALL ISSUES:
 ${issuesText}
 
-Provide a friendly, actionable summary:`;
+Please provide a summary that:
+1. States the total number of issues created (${totalIssues})
+2. Highlights which HIGH priority issues need to be solved (list them if any)
+3. Provides overall project status and recommendations
+
+Format your response in 3-4 clear sentences:`;
 
     try {
       const completion = await openai.chat.completions.create({

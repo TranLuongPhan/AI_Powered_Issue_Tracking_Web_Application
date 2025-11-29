@@ -61,24 +61,24 @@ function SortableItem({ issue }: { issue: Issue }) {
       ref={setNodeRef}
       style={{
         ...style,
-        background: "white",
+        background: "#1f2937",
         padding: "1rem",
         margin: "0.5rem 0",
         borderRadius: "4px",
-        border: "1px solid #e5e7eb",
+        border: "1px solid #374151",
         cursor: "grab",
-        boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
       }}
       {...attributes}
       {...listeners}
     >
-      <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.95rem", fontWeight: 600 }}>{issue.title}</h4>
+      <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.95rem", fontWeight: 600, color: "white" }}>{issue.title}</h4>
       {issue.description && (
-        <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#d1d5db", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {issue.description}
         </p>
       )}
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#6b7280" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#d1d5db" }}>
         <span>{issue.priority}</span>
       </div>
     </div>
@@ -178,7 +178,8 @@ export default function KanbanBoard({ issues, onUpdateIssue }: KanbanBoardProps)
           <div
             key={columnId}
             style={{
-              background: "#f3f4f6",
+              background: "#374151",
+              border: "1px solid #1f2937",
               borderRadius: "8px",
               padding: "1rem",
               minWidth: "280px",
@@ -187,8 +188,8 @@ export default function KanbanBoard({ issues, onUpdateIssue }: KanbanBoardProps)
               flexDirection: "column",
             }}
           >
-            <h3 style={{ margin: "0 0 1rem 0", fontSize: "1rem", fontWeight: "bold", color: "#374151" }}>
-              {columnId} <span style={{ color: "#9ca3af", fontWeight: "normal" }}>({columns[columnId]?.length || 0})</span>
+            <h3 style={{ margin: "0 0 1rem 0", fontSize: "1rem", fontWeight: "bold", color: "white" }}>
+              {columnId} <span style={{ color: "#d1d5db", fontWeight: "normal" }}>({columns[columnId]?.length || 0})</span>
             </h3>
             
             <SortableContext
@@ -210,21 +211,21 @@ export default function KanbanBoard({ issues, onUpdateIssue }: KanbanBoardProps)
         {activeIssue ? (
            <div
            style={{
-             background: "white",
+             background: "#1f2937",
              padding: "1rem",
              borderRadius: "4px",
-             border: "1px solid #e5e7eb",
-             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+             border: "1px solid #374151",
+             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
              width: "280px" // Match column width roughly
            }}
          >
-           <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.95rem", fontWeight: 600 }}>{activeIssue.title}</h4>
+           <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.95rem", fontWeight: 600, color: "white" }}>{activeIssue.title}</h4>
            {activeIssue.description && (
-             <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+             <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#d1d5db", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                {activeIssue.description}
              </p>
            )}
-           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#6b7280" }}>
+           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#d1d5db" }}>
              <span>{activeIssue.priority}</span>
            </div>
          </div>
