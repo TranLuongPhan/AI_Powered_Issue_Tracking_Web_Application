@@ -47,6 +47,18 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [aiChatInput, setAiChatInput] = useState("");
+  
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterAssignee, setFilterAssignee] = useState("");
+  const [filterPriority, setFilterPriority] = useState("");
+  const [filterHasDueDate, setFilterHasDueDate] = useState(false);
+  const [filterDueDateFrom, setFilterDueDateFrom] = useState("");
+  const [filterDueDateTo, setFilterDueDateTo] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     if (session) {
