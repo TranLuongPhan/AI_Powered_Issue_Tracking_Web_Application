@@ -14,6 +14,7 @@ import {
   DragEndEvent,
   defaultDropAnimationSideEffects,
   DropAnimation,
+  useDroppable,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -74,6 +75,23 @@ function SortableItem({ issue, onDeleteIssue, onUpdateIssue, onUpdatePriority, o
     }
   };
 
+  // Create a custom drag handle that doesn't interfere with inputs
+  const dragHandleProps = {
+    ...attributes,
+    ...listeners,
+    style: {
+      cursor: "grab",
+      padding: "0.25rem",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "4px",
+      marginRight: "0.5rem",
+      background: "#374151",
+      flexShrink: 0
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -84,43 +102,49 @@ function SortableItem({ issue, onDeleteIssue, onUpdateIssue, onUpdatePriority, o
         margin: "0.5rem 0",
         borderRadius: "4px",
         border: "1px solid #374151",
-        cursor: "grab",
         boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
         position: "relative",
-      }}
-      {...attributes}
-      {...listeners}
-      onMouseDown={(e) => {
-        // Only allow drag if clicking on the card background, not on inputs/selects
-        const target = e.target as HTMLElement;
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT" || target.closest("input, textarea, select")) {
-          e.stopPropagation();
-        }
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "0.5rem"
       }}
     >
-      {onDeleteIssue && (
-        <button
-          onClick={handleDelete}
-          style={{
-            position: "absolute",
-            top: "0.5rem",
-            right: "0.5rem",
-            padding: "0.25rem 0.5rem",
-            background: "#dc2626",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "0.7rem",
-            zIndex: 10,
-          }}
-          title="Delete issue"
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          ×
-        </button>
-      )}
-      {onUpdateTitle ? (
+      {/* Drag Handle */}
+      <div {...dragHandleProps} title="Drag to move">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="4" cy="4" r="1.5" fill="#9ca3af"/>
+          <circle cx="12" cy="4" r="1.5" fill="#9ca3af"/>
+          <circle cx="4" cy="8" r="1.5" fill="#9ca3af"/>
+          <circle cx="12" cy="8" r="1.5" fill="#9ca3af"/>
+          <circle cx="4" cy="12" r="1.5" fill="#9ca3af"/>
+          <circle cx="12" cy="12" r="1.5" fill="#9ca3af"/>
+        </svg>
+      </div>
+      
+      <div style={{ flex: 1, position: "relative" }}>
+        {onDeleteIssue && (
+          <button
+            onClick={handleDelete}
+            style={{
+              position: "absolute",
+              top: "0",
+              right: "0",
+              padding: "0.25rem 0.5rem",
+              background: "#dc2626",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "0.7rem",
+              zIndex: 10,
+            }}
+            title="Delete issue"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            ×
+          </button>
+        )}
+        {onUpdateTitle ? (
         <input
           type="text"
           value={issue.title}
@@ -265,6 +289,31 @@ function SortableItem({ issue, onDeleteIssue, onUpdateIssue, onUpdatePriority, o
   );
 }
 
+// Column component that is droppable
+function DroppableColumn({ columnId, children }: { columnId: string; children: React.ReactNode }) {
+  const { setNodeRef } = useDroppable({
+    id: columnId,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        background: "#374151",
+        border: "1px solid #1f2937",
+        borderRadius: "8px",
+        padding: "1rem",
+        minWidth: "280px",
+        width: "280px",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function KanbanBoard({ issues, onUpdateIssue, onUpdatePriority, onDeleteIssue, onUpdateTitle, onUpdateDescription }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
@@ -392,7 +441,8 @@ export default function KanbanBoard({ issues, onUpdateIssue, onUpdatePriority, o
               </div>
             </SortableContext>
           </div>
-        ))}
+        );
+        })}
       </div>
 
       <DragOverlay dropAnimation={dropAnimation}>

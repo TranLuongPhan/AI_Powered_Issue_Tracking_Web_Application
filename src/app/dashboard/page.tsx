@@ -386,22 +386,47 @@ export default function DashboardPage() {
         
         {/* AI Chat Input */}
         <div style={{ marginBottom: "1rem" }}>
-          <textarea
-            value={aiChatInput}
-            onChange={(e) => setAiChatInput(e.target.value)}
-            placeholder="Ask AI about your project (e.g., 'What are the high priority issues?', 'Give me a summary')"
-            style={{
-              width: "100%",
-              padding: "0.75rem",
-              background: "#1e40af",
-              color: "white",
-              border: "1px solid #3b82f6",
-              borderRadius: "4px",
-              minHeight: "80px",
-              resize: "vertical",
-              fontSize: "0.9rem"
-            }}
-          />
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <textarea
+              value={aiChatInput}
+              onChange={(e) => setAiChatInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  handleGenerateSummary();
+                }
+              }}
+              placeholder="Ask AI about your project (e.g., 'What are the high priority issues?', 'Give me a summary'). Press Ctrl+Enter to submit."
+              style={{
+                flex: 1,
+                padding: "0.75rem",
+                background: "#1e40af",
+                color: "white",
+                border: "1px solid #3b82f6",
+                borderRadius: "4px",
+                minHeight: "80px",
+                resize: "vertical",
+                fontSize: "0.9rem"
+              }}
+            />
+            <button
+              onClick={handleGenerateSummary}
+              disabled={summaryLoading}
+              style={{
+                padding: "0.75rem 1.5rem",
+                background: summaryLoading ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: summaryLoading ? "not-allowed" : "pointer",
+                fontWeight: "500",
+                alignSelf: "flex-start",
+                whiteSpace: "nowrap"
+              }}
+            >
+              {summaryLoading ? "Generating..." : "Enter"}
+            </button>
+          </div>
         </div>
 
         {summary && (
