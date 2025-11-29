@@ -105,11 +105,42 @@ Format your response in 3-4 clear sentences:`;
       const summary = completion.choices[0]?.message?.content || "Unable to generate summary.";
 
       return NextResponse.json({ summary });
-    } catch (openaiError) {
+    } catch (openaiError: any) {
       console.error("OpenAI API error:", openaiError);
+      
+      // Check if it's a quota/billing error
+      const errorMessage = openaiError?.message || "";
+      const isQuotaError = errorMessage.includes("429") || 
+                          errorMessage.includes("quota") || 
+                          errorMessage.includes("billing") ||
+                          errorMessage.includes("exceeded");
+
+      if (isQuotaError) {
+        // Generate a fallback summary without AI
+        const highPriorityList = highPriorityIssues.length > 0
+          ? highPriorityIssues.map((issue, idx) => `${idx + 1}. ${issue.title} (${issue.status})`).join('\n')
+          : "None";
+
+        const fallbackSummary = `📊 Project Summary: You have ${totalIssues} total issue${totalIssues !== 1 ? 's' : ''} in your project. 
+
+${highPriorityIssues.length > 0 
+  ? `⚠️ HIGH Priority Issues (${highPriorityIssues.length}) that need attention:\n${highPriorityList}\n\nPlease prioritize resolving these high-priority items.`
+  : '✅ No high-priority issues at the moment.'}
+
+📈 Status Breakdown: ${inProgressIssues.length} in progress, ${doneIssues.length} completed, ${backlogIssues.length} in backlog.
+
+${inProgressIssues.length > 0 ? `💼 Currently working on ${inProgressIssues.length} issue${inProgressIssues.length !== 1 ? 's' : ''}.` : ''} ${doneIssues.length > 0 ? `✅ Completed ${doneIssues.length} issue${doneIssues.length !== 1 ? 's' : ''}.` : ''}`;
+
+        return NextResponse.json({ 
+          summary: fallbackSummary,
+          note: "AI service unavailable - showing basic summary"
+        });
+      }
+
+      // For other errors, return error message
       return NextResponse.json({ 
         message: "Failed to generate summary from AI service",
-        error: openaiError instanceof Error ? openaiError.message : "Unknown OpenAI error"
+        error: errorMessage
       }, { status: 500 });
     }
   } catch (error) {

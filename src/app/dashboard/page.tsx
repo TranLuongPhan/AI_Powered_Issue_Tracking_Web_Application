@@ -155,7 +155,7 @@ export default function DashboardPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setSummary(data.summary);
+        setSummary(data.summary + (data.note ? `\n\n(${data.note})` : ''));
       } else {
         const error = await res.json();
         setSummary(`Error: ${error.message || "Failed to generate summary"}`);
