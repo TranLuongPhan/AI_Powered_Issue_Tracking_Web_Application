@@ -66,6 +66,35 @@ export const config = NextAuth({
   session: {
     strategy: "jwt"
   },
+  events: {
+    createUser: async ({ user }) => {
+      if (!user.id) return;
+
+      // Create a default team
+      const team = await prisma.team.create({
+        data: {
+          name: "Personal Team",
+          ownerId: user.id,
+          members: {
+            create: {
+              userId: user.id,
+              role: "OWNER"
+            }
+          }
+        }
+      });
+
+      // Create a default project
+      await prisma.project.create({
+        data: {
+          name: "My Project",
+          description: "Your first project",
+          teamId: team.id,
+          ownerId: user.id,
+        }
+      });
+    }
+  },
   callbacks: {
     async session({ session, token }) {
       if (token.sub && session.user) {
