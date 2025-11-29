@@ -90,6 +90,13 @@ function SortableItem({ issue, onDeleteIssue, onUpdateIssue, onUpdatePriority, o
       }}
       {...attributes}
       {...listeners}
+      onMouseDown={(e) => {
+        // Only allow drag if clicking on the card background, not on inputs/selects
+        const target = e.target as HTMLElement;
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT" || target.closest("input, textarea, select")) {
+          e.stopPropagation();
+        }
+      }}
     >
       {onDeleteIssue && (
         <button
@@ -125,8 +132,20 @@ function SortableItem({ issue, onDeleteIssue, onUpdateIssue, onUpdatePriority, o
             e.stopPropagation();
             onUpdateTitle(issue.id, e.target.value);
           }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+          }}
+          onKeyUp={(e) => {
+            e.stopPropagation();
+          }}
           onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+          }}
+          onDragStart={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           style={{
             margin: "0 0 0.5rem 0",
             padding: "0.25rem 0.5rem",
@@ -154,8 +173,20 @@ function SortableItem({ issue, onDeleteIssue, onUpdateIssue, onUpdatePriority, o
             e.stopPropagation();
             onUpdateDescription(issue.id, e.target.value);
           }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+          }}
+          onKeyUp={(e) => {
+            e.stopPropagation();
+          }}
           onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+          }}
+          onDragStart={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           placeholder="No description"
           style={{
             margin: "0 0 0.5rem 0",

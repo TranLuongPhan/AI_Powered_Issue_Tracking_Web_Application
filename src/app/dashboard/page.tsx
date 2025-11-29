@@ -37,10 +37,11 @@ export default function DashboardPage() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aiChatInput, setAiChatInput] = useState("");
 
   useEffect(() => {
     if (session) {
-      fetchIssues();
+      // Don't auto-fetch, user will click refresh button
     } else {
       // Show fake data when not logged in
       setIssues(FAKE_ISSUES);
@@ -240,12 +241,15 @@ export default function DashboardPage() {
 
   const handleGenerateSummary = async () => {
     setSummaryLoading(true);
+    const currentInput = aiChatInput;
+    setAiChatInput(""); // Clear input when generating summary
     setSummary(null);
 
     try {
       const res = await fetch("/api/ai/summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: currentInput || undefined }),
       });
 
       if (res.ok) {
@@ -265,7 +269,7 @@ export default function DashboardPage() {
 
   const isDemoAccount = session?.user?.email === "litmerscontest2911@gmail.com";
 
-  return (
+    return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
         #create-issue-form input::placeholder,
@@ -294,20 +298,9 @@ export default function DashboardPage() {
           <h1 style={{ margin: 0 }}>My Dashboard</h1>
         </div>
         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <button 
-            onClick={() => setViewMode(viewMode === "list" ? "board" : "list")}
-            style={{
-                padding: "0.5rem 1rem",
-                background: "white",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                cursor: "pointer"
-            }}
-          >
-            Switch to {viewMode === "list" ? "Board" : "List"} View
-          </button>
+          <Link href="/profile" style={{ color: "blue", textDecoration: "underline" }}>Profile</Link>
           <Link href="/teams" style={{ color: "blue", textDecoration: "underline" }}>Manage Teams</Link>
-          <LogoutButton />
+            <LogoutButton />
         </div>
       </div>
 
@@ -390,6 +383,27 @@ export default function DashboardPage() {
             {summaryLoading ? "Generating..." : "Generate Summary"}
           </button>
         </div>
+        
+        {/* AI Chat Input */}
+        <div style={{ marginBottom: "1rem" }}>
+          <textarea
+            value={aiChatInput}
+            onChange={(e) => setAiChatInput(e.target.value)}
+            placeholder="Ask AI about your project (e.g., 'What are the high priority issues?', 'Give me a summary')"
+            style={{
+              width: "100%",
+              padding: "0.75rem",
+              background: "#1e40af",
+              color: "white",
+              border: "1px solid #3b82f6",
+              borderRadius: "4px",
+              minHeight: "80px",
+              resize: "vertical",
+              fontSize: "0.9rem"
+            }}
+          />
+        </div>
+
         {summary && (
           <div style={{ 
             background: "#1e40af", 
@@ -397,21 +411,54 @@ export default function DashboardPage() {
             borderRadius: "4px",
             border: "1px solid #3b82f6",
             lineHeight: "1.6",
-            color: "white"
+            color: "white",
+            whiteSpace: "pre-wrap"
           }}>
             {summary}
           </div>
         )}
         {!summary && !summaryLoading && (
           <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.9rem" }}>
-            Click "Generate Summary" to get an AI-powered overview of your project status.
+            Type a question or click "Generate Summary" to get an AI-powered overview of your project status.
           </p>
         )}
       </div>
 
       {/* Issue Board / List */}
       <div>
-        <h2>{viewMode === "board" ? "Issue Board" : "Issue List"}</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <h2 style={{ margin: 0 }}>{viewMode === "board" ? "Issue Board" : "Issue List"}</h2>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <button 
+              onClick={fetchIssues}
+              disabled={loading}
+              style={{
+                padding: "0.5rem 1rem",
+                background: loading ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontSize: "0.875rem"
+              }}
+              title="Refresh issues"
+            >
+              {loading ? "Refreshing..." : "🔄 Refresh"}
+            </button>
+            <button 
+              onClick={() => setViewMode(viewMode === "list" ? "board" : "list")}
+              style={{
+                padding: "0.5rem 1rem",
+                background: "white",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                cursor: "pointer"
+              }}
+            >
+              Switch to {viewMode === "list" ? "Board" : "List"} View
+            </button>
+          </div>
+        </div>
         {!session && (
           <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "1rem", fontStyle: "italic" }}>
             Please login to use the service
@@ -472,6 +519,8 @@ export default function DashboardPage() {
                         value={issue.title}
                         onChange={(e) => handleUpdateTitle(issue.id, e.target.value)}
                         onBlur={(e) => handleUpdateTitle(issue.id, e.target.value)}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        onKeyUp={(e) => e.stopPropagation()}
                         style={{
                           padding: "0.5rem",
                           background: "#1f2937",
@@ -488,6 +537,8 @@ export default function DashboardPage() {
                         value={issue.description || ""}
                         onChange={(e) => handleUpdateDescription(issue.id, e.target.value)}
                         onBlur={(e) => handleUpdateDescription(issue.id, e.target.value)}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        onKeyUp={(e) => e.stopPropagation()}
                         placeholder="No description"
                         style={{
                           padding: "0.5rem",
@@ -594,5 +645,5 @@ export default function DashboardPage() {
       </div>
     </div>
     </>
-  );
+    );
 }

@@ -16,6 +16,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "OpenAI API key not configured" }, { status: 500 });
     }
 
+    const { message } = await req.json();
+    const userMessage = message?.trim() || "";
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
@@ -69,7 +72,29 @@ export async function POST(req: Request) {
       `${idx + 1}. [${issue.status}] ${issue.title} (Priority: ${issue.priority})${issue.description ? ` - ${issue.description}` : ''}`
     ).join('\n');
 
-    const prompt = `You are a project management assistant. Analyze the following project data and provide a concise, actionable summary.
+    // Build the prompt based on whether user provided a custom message
+    let prompt = "";
+    if (userMessage) {
+      // User asked a specific question
+      prompt = `You are a project management assistant. The user asked: "${userMessage}"
+
+PROJECT STATISTICS:
+- Total Issues: ${totalIssues}
+- High Priority Issues: ${highPriorityIssues.length}
+- In Progress: ${inProgressIssues.length}
+- Done: ${doneIssues.length}
+- Backlog: ${backlogIssues.length}
+
+HIGH PRIORITY ISSUES (These should be solved first):
+${highPriorityText}
+
+ALL ISSUES:
+${issuesText}
+
+Please answer the user's question based on the project data above. Be concise and actionable.`;
+    } else {
+      // Default summary
+      prompt = `You are a project management assistant. Analyze the following project data and provide a concise, actionable summary.
 
 PROJECT STATISTICS:
 - Total Issues: ${totalIssues}
@@ -90,6 +115,7 @@ Please provide a summary that:
 3. Provides overall project status and recommendations
 
 Format your response in 3-4 clear sentences:`;
+    }
 
     try {
       const completion = await openai.chat.completions.create({
