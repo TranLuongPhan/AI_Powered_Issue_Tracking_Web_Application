@@ -1,190 +1,357 @@
-# VibeCode App
+# AI-Powered Issue Tracking Web Application
 
-A full-stack Next.js application with authentication, built with Prisma, NextAuth, and Supabase.
+A modern, full-featured issue tracking system built with Next.js, featuring AI-powered project summaries, drag-and-drop Kanban boards, and comprehensive issue management capabilities.
 
-## Features
+## 🚀 Features
 
-- 🔐 **Authentication**: Email/password authentication with NextAuth.js
-- 🗄️ **Database**: PostgreSQL via Supabase with Prisma ORM
-- 🎨 **Modern UI**: Built with Next.js 16 and React 19
-- 🚀 **Deployment**: Optimized for Vercel deployment
-- 🔒 **Protected Routes**: Middleware-based route protection
+### Authentication & User Management
+- **Multiple Authentication Methods**
+  - Email/Password authentication
+  - Google OAuth integration
+  - Account linking for same email addresses
+  - Auto-login after registration
 
-## Tech Stack
+- **Profile Management (FR-005)**
+  - Edit name (1-50 characters validation)
+  - Update profile image via URL
+  - Changes reflect immediately
+  - Profile page accessible from dashboard
 
-- **Framework**: Next.js 16 (App Router)
-- **Authentication**: NextAuth.js v5
-- **Database**: Supabase (PostgreSQL)
-- **ORM**: Prisma
-- **Deployment**: Vercel
-- **Language**: TypeScript
+- **Password Management (FR-006)**
+  - Change password functionality
+  - Current password verification
+  - New password validation (6-100 characters)
+  - Password confirmation matching
+  - Disabled for OAuth-only users
 
-## Getting Started
+### Issue Management
+- **Create Issues**
+  - Title and description
+  - Status selection (Backlog, In Progress, Done)
+  - Priority levels (HIGH, MEDIUM, LOW)
+  - Auto-assignment to creator
+  - Auto-creation of default project if missing
 
-### Prerequisites
+- **Issue Views**
+  - **Kanban Board View**: Drag-and-drop interface with columns for Backlog, In Progress, and Done
+  - **List View**: Detailed list of all issues
+  - Toggle between views seamlessly
+  - Real-time updates
 
-- Node.js 18+ installed
-- A Supabase account (free tier available)
-- A Vercel account (optional, for deployment)
+- **Issue Editing**
+  - Inline editing of title and description with auto-save
+  - Status dropdown for quick updates
+  - Priority dropdown for priority changes
+  - Delete functionality with soft delete
+  - Optimistic UI updates
 
-### 1. Clone and Install
+- **Issue Search & Filtering (FR-036)**
+  - **Search**: Title text search (case-insensitive)
+  - **Filters**:
+    - By status (Backlog / In Progress / Done)
+    - By priority (HIGH / MEDIUM / LOW)
+    - By assignee
+    - Has due date checkbox
+    - Due date range (from/to dates)
+  - **Sorting**:
+    - Creation date (newest/oldest)
+    - Last modified date
+    - Due date (earliest/latest)
+    - Priority (HIGH → MEDIUM → LOW)
+  - Filter panel with "Apply Filters" and "Clear All" buttons
 
+### AI-Powered Features
+- **AI Project Summary**
+  - Generate AI-powered project overviews
+  - Chat interface for asking questions about the project
+  - Fallback summary when AI service is unavailable
+  - Integration with OpenAI API
+  - Real-time insights and recommendations
+
+### Team & Project Management
+- **Team Management**
+  - Create teams
+  - View team members and project counts
+  - Personal Team auto-created on signup
+  - Team member roles (OWNER, ADMIN, MEMBER)
+
+- **Project Management**
+  - Default "My Project" created automatically
+  - Projects associated with teams
+  - Auto-creation if project is missing
+
+### UI/UX Features
+- **Dark Theme**: Modern dark UI throughout the application
+- **Responsive Design**: Works on various screen sizes
+- **Loading States**: Smooth loading indicators
+- **Error Handling**: User-friendly error messages
+- **Optimistic Updates**: Instant UI feedback
+- **Keyboard Shortcuts**: Ctrl+Enter to submit AI chat
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 14+** - React framework with App Router
+- **React** - UI library
+- **TypeScript** - Type safety
+- **NextAuth.js** - Authentication
+- **@dnd-kit** - Drag-and-drop functionality
+- **OpenAI API** - AI-powered summaries
+
+### Backend
+- **Next.js API Routes** - Serverless API endpoints
+- **Prisma ORM** - Database management
+- **PostgreSQL** - Primary database (Supabase)
+- **bcryptjs** - Password hashing
+
+### Database
+- **PostgreSQL** (via Supabase)
+- **Prisma** as ORM
+- Soft delete support
+- Relationship management
+
+## 📋 Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- PostgreSQL database (Supabase recommended)
+- OpenAI API key (for AI features)
+
+## 🔧 Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/TranLuongPhan/AI_Powered_Issue_Tracking_Web_Application.git
+   cd AI_Powered_Issue_Tracking_Web_Application
+   ```
+
+2. **Install dependencies**
 ```bash
-git clone <your-repo-url>
-cd vibecode-app
-npm install
-```
+   npm install
+   ```
 
-### 2. Set Up Database
+3. **Set up environment variables**
+   Create a `.env` file in the root directory:
+   ```env
+   # Database
+   DATABASE_URL="your_postgresql_connection_string"
+   DIRECT_URL="your_direct_postgresql_connection_string"
 
-Follow the detailed instructions in [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) to:
-- Create a Supabase project
-- Get your connection strings
-- Configure environment variables
+   # NextAuth
+   AUTH_SECRET="your_auth_secret"
+   NEXTAUTH_URL="http://localhost:3000"
 
-### 3. Configure Environment Variables
+   # Google OAuth
+   AUTH_GOOGLE_ID="your_google_client_id"
+   AUTH_GOOGLE_SECRET="your_google_client_secret"
 
-Create a `.env` file in the project root (use `.env.example` as template):
+   # OpenAI (for AI features)
+   OPENAI_API_KEY="your_openai_api_key"
+   ```
 
-```bash
-# Database (from Supabase)
-DATABASE_URL="your-pooling-connection-string"
-DIRECT_URL="your-direct-connection-string"
+4. **Set up the database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-# Authentication
-AUTH_SECRET="generate-with-openssl-rand-base64-32"
-NEXTAUTH_URL="http://localhost:3000"
-```
-
-Generate `AUTH_SECRET`:
-```bash
-openssl rand -base64 32
-```
-
-### 4. Run Database Migrations
-
-```bash
-npx prisma migrate dev --name init
-```
-
-### 5. Start Development Server
-
+5. **Run the development server**
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see your application.
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-vibecode-app/
-├── prisma/
-│   └── schema.prisma          # Database schema
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── auth/          # NextAuth API routes
-│   │   │   └── register/      # Registration API
-│   │   ├── dashboard/         # Protected dashboard page
-│   │   ├── login/             # Login page
-│   │   ├── register/          # Registration page
-│   │   └── layout.tsx         # Root layout with SessionProvider
-│   ├── lib/
-│   │   └── prisma.ts          # Prisma client singleton
-│   ├── auth.ts                # NextAuth configuration
-│   └── middleware.ts          # Route protection middleware
-├── .env.example               # Environment variables template
-├── SUPABASE_SETUP.md          # Detailed Supabase setup guide
-└── vercel.json                # Vercel deployment config
+│   │   │   ├── ai/
+│   │   │   │   └── summary/        # AI summary endpoint
+│   │   │   ├── issues/             # Issue CRUD endpoints
+│   │   │   ├── profile/            # Profile management endpoints
+│   │   │   ├── register/           # User registration
+│   │   │   └── teams/              # Team management endpoints
+│   │   ├── dashboard/              # Main dashboard page
+│   │   ├── login/                  # Login page
+│   │   ├── profile/                # Profile management page
+│   │   ├── register/               # Registration page
+│   │   ├── teams/                  # Team management page
+│   │   └── page.tsx                # Landing page
+│   ├── auth.ts                     # NextAuth configuration
+│   ├── components/
+│   │   ├── KanbanBoard.tsx         # Kanban board component
+│   │   └── LogoutButton.tsx        # Logout button component
+│   └── lib/
+│       └── prisma.ts               # Prisma client
+├── prisma/
+│   └── schema.prisma               # Database schema
+└── public/                        # Static assets
 ```
 
-## Available Scripts
+## 🔐 Authentication
 
-```bash
-# Development
-npm run dev          # Start development server
+### Supported Methods
+1. **Email/Password**: Traditional credentials-based authentication
+2. **Google OAuth**: One-click Google sign-in
 
-# Production
-npm run build        # Build for production
-npm start            # Start production server
+### User Registration
+- Email validation (max 255 characters, valid email format)
+- Password validation (6-100 characters)
+- Name validation (1-50 characters)
+- Auto-creation of default team and project
+- Automatic login after successful registration
 
-# Database
-npx prisma studio    # Open database GUI
-npx prisma migrate dev    # Run migrations (development)
-npx prisma migrate deploy # Run migrations (production)
-npx prisma generate  # Generate Prisma Client
+## 📊 Database Schema
 
-# Linting
-npm run lint         # Run ESLint
-```
+### Models
+- **User**: User accounts with authentication
+- **Account**: OAuth account linking
+- **Session**: User sessions
+- **Team**: Team/organization management
+- **TeamMember**: Team membership with roles
+- **Project**: Projects within teams
+- **Issue**: Issue tracking with status, priority, assignee
+- **Comment**: Issue comments (schema ready)
 
-## Authentication Flow
+### Key Relationships
+- Users belong to Teams via TeamMember
+- Projects belong to Teams
+- Issues belong to Projects
+- Issues have Creators and Assignees (Users)
+- Soft delete support on Team, Project, Issue, Comment
 
-1. **Registration** (`/register`):
-   - User enters name, email, and password
-   - Password is hashed with bcrypt
-   - User is stored in Supabase database
-   - Redirects to login page
+## 🚀 Deployment
 
-2. **Login** (`/login`):
-   - User enters email and password
-   - NextAuth validates credentials
-   - JWT session is created
-   - Redirects to dashboard
+### Vercel Deployment
+1. Connect your GitHub repository to Vercel
+2. Add all environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
 
-3. **Protected Routes**:
-   - Middleware checks authentication
-   - Unauthenticated users are redirected to login
-   - Currently protects `/dashboard/*` routes
+### Environment Variables for Production
+Ensure all environment variables from `.env` are set in your deployment platform:
+- `DATABASE_URL`
+- `DIRECT_URL`
+- `AUTH_SECRET`
+- `NEXTAUTH_URL` (production URL)
+- `AUTH_GOOGLE_ID`
+- `AUTH_GOOGLE_SECRET`
+- `OPENAI_API_KEY`
 
-## Deployment to Vercel
+## 📝 API Endpoints
 
-### Quick Deploy
+### Authentication
+- `POST /api/register` - User registration
+- `POST /api/auth/signin` - Sign in (handled by NextAuth)
+- `POST /api/auth/signout` - Sign out (handled by NextAuth)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
+### Issues
+- `GET /api/issues` - Get all issues (with search/filter/sort params)
+- `POST /api/issues` - Create new issue
+- `PUT /api/issues` - Update issue
+- `DELETE /api/issues` - Soft delete issue
 
-### Manual Deployment
+### Profile
+- `GET /api/profile/check-password` - Check if user has password
+- `PUT /api/profile` - Update profile
+- `PUT /api/profile/password` - Change password
 
-1. Push your code to GitHub
-2. Import project in Vercel dashboard
-3. Add environment variables in Vercel:
-   - `DATABASE_URL`
-   - `DIRECT_URL`
-   - `AUTH_SECRET`
-   - `NEXTAUTH_URL` (your production URL)
-4. Deploy!
+### Teams
+- `GET /api/teams` - Get user's teams
+- `POST /api/teams` - Create new team
 
-See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for detailed deployment instructions.
+### AI
+- `POST /api/ai/summary` - Generate AI project summary
 
-## Troubleshooting
+## 🎨 UI Components
 
-### Common Issues
+### Kanban Board
+- Drag-and-drop functionality
+- Three columns: Backlog, In Progress, Done
+- Inline editing of title, description, status, priority
+- Delete button on each card
+- Drag handle for easy movement
 
-**"Environment variable not found"**
-- Ensure `.env` file exists in project root
-- Restart dev server after changing `.env`
+### Dashboard
+- Issue creation form
+- AI summary section with chat interface
+- View toggle (Board/List)
+- Search and filter panel
+- Refresh button
 
-**"Can't reach database server"**
-- Verify Supabase connection strings are correct
-- Check that database password is correct
-- Ensure Supabase project is active
+## 🔒 Security Features
 
-**"Prisma Client not found"**
-- Run `npx prisma generate`
-- Restart dev server
+- Password hashing with bcrypt
+- Session management with NextAuth
+- CSRF protection
+- Input validation on frontend and backend
+- Soft delete for data recovery
+- Authentication required for all API endpoints
 
-See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for more troubleshooting tips.
+## 📱 User Flows
 
-## Learn More
+### New User Registration
+1. User registers with email/password or Google OAuth
+2. System creates:
+   - User account
+   - Personal Team
+   - Default "My Project"
+3. User is automatically logged in
+4. User can immediately create issues
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [NextAuth.js Documentation](https://next-auth.js.org)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [Supabase Documentation](https://supabase.com/docs)
-- [Vercel Documentation](https://vercel.com/docs)
+### Issue Creation Flow
+1. User fills out issue form
+2. If project doesn't exist, system auto-creates it
+3. Issue is created and assigned to creator
+4. Issue appears in Kanban board and list view
 
-## License
+### Search & Filter Flow
+1. User clicks "🔍 Filters" button
+2. Filter panel opens
+3. User sets search query and/or filters
+4. User clicks "Apply Filters"
+5. Issues are fetched with applied filters
+6. Results update in real-time
 
-MIT
+## 🐛 Known Issues & Limitations
 
+- Label filtering not yet implemented (schema ready)
+- Assignee filter needs user list population
+- AI features require OpenAI API key with quota
+- Demo account (`litmerscontest2911@gmail.com`) shows warning banner
+
+## 🚧 Future Enhancements
+
+- [ ] Issue labels/tags
+- [ ] Issue comments functionality
+- [ ] File attachments
+- [ ] Email notifications
+- [ ] Advanced reporting
+- [ ] Issue templates
+- [ ] Bulk operations
+- [ ] Export functionality
+
+## 📄 License
+
+This project is part of a contest submission.
+
+## 👤 Author
+
+**Tran Luong Phan**
+- GitHub: [@TranLuongPhan](https://github.com/TranLuongPhan)
+- Email: luongphantran1997@gmail.com
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- Prisma for excellent ORM
+- Vercel for seamless deployment
+- OpenAI for AI capabilities
+- Supabase for PostgreSQL hosting
+
+---
+
+**Note**: This application is built as an MVP (Minimum Viable Product) for a contest. Some features may be simplified but the core functionality is fully operational.
