@@ -14,6 +14,16 @@ interface Issue {
   priority: string;
 }
 
+// Fake demo data for when user is not logged in
+const FAKE_ISSUES: Issue[] = [
+  { id: "fake-1", title: "Implement user authentication", description: "Add login and signup functionality", status: "Done", priority: "HIGH" },
+  { id: "fake-2", title: "Design dashboard UI", description: "Create responsive dashboard layout", status: "Done", priority: "MEDIUM" },
+  { id: "fake-3", title: "Add issue tracking", description: "Implement CRUD operations for issues", status: "In Progress", priority: "HIGH" },
+  { id: "fake-4", title: "Setup database schema", description: "Create Prisma models and migrations", status: "In Progress", priority: "MEDIUM" },
+  { id: "fake-5", title: "Write unit tests", description: "Add test coverage for API routes", status: "Backlog", priority: "LOW" },
+  { id: "fake-6", title: "Deploy to production", description: "Configure Vercel deployment", status: "Backlog", priority: "MEDIUM" },
+];
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -28,8 +38,13 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchIssues();
-  }, []);
+    if (session) {
+      fetchIssues();
+    } else {
+      // Show fake data when not logged in
+      setIssues(FAKE_ISSUES);
+    }
+  }, [session]);
 
   const fetchIssues = async () => {
     const res = await fetch("/api/issues");
@@ -68,6 +83,14 @@ export default function DashboardPage() {
   };
 
   const handleUpdateIssueStatus = async (id: string, newStatus: string) => {
+    // If not logged in, just update locally (fake data)
+    if (!session) {
+      setIssues(prev => prev.map(issue => 
+        issue.id === id ? { ...issue, status: newStatus } : issue
+      ));
+      return;
+    }
+
     // Optimistic update
     setIssues(prev => prev.map(issue => 
         issue.id === id ? { ...issue, status: newStatus } : issue
@@ -196,9 +219,9 @@ export default function DashboardPage() {
       </div>
 
       {/* AI Summary Section */}
-      <div style={{ background: "#e0f2fe", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem", border: "1px solid #bae6fd" }}>
+      <div style={{ background: "#1e3a8a", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem", border: "1px solid #1e40af" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-          <h2 style={{ margin: 0 }}>🤖 AI Project Summary</h2>
+          <h2 style={{ margin: 0, color: "white" }}>🤖 AI Project Summary</h2>
           <button 
             onClick={handleGenerateSummary}
             disabled={summaryLoading}
@@ -217,18 +240,18 @@ export default function DashboardPage() {
         </div>
         {summary && (
           <div style={{ 
-            background: "white", 
+            background: "#1e40af", 
             padding: "1rem", 
             borderRadius: "4px",
-            border: "1px solid #bae6fd",
+            border: "1px solid #3b82f6",
             lineHeight: "1.6",
-            color: "#1e293b"
+            color: "white"
           }}>
             {summary}
           </div>
         )}
         {!summary && !summaryLoading && (
-          <p style={{ margin: 0, color: "#64748b", fontSize: "0.9rem" }}>
+          <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.9rem" }}>
             Click "Generate Summary" to get an AI-powered overview of your project status.
           </p>
         )}
@@ -237,6 +260,11 @@ export default function DashboardPage() {
       {/* Issue Board / List */}
       <div>
         <h2>My Issues</h2>
+        {!session && (
+          <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "1rem", fontStyle: "italic" }}>
+            Demo mode: Showing sample data. Please log in to see your actual issues.
+          </p>
+        )}
         {issues.length === 0 ? (
             <p>No issues yet. Create one above!</p>
         ) : viewMode === "board" ? (
